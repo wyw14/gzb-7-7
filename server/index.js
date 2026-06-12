@@ -1,10 +1,10 @@
-const express = require('express');
+﻿const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 
 const app = express();
-const PORT = 3001;
+const PORT = 3107;
 
 app.use(cors());
 app.use(bodyParser.json({ limit: '10mb' }));
@@ -27,9 +27,10 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/recommendations', recommendRoutes);
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: '旧乐器流转与练习搭子平台服务运行中' });
+  res.json({ status: 'ok', message: '鏃т箰鍣ㄦ祦杞笌缁冧範鎼瓙骞冲彴鏈嶅姟杩愯涓? });
 });
 
 app.listen(PORT, () => {
-  console.log(`服务器运行在 http://localhost:${PORT}`);
+  console.log(`鏈嶅姟鍣ㄨ繍琛屽湪 http://localhost:${PORT}`);
 });
+

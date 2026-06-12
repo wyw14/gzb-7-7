@@ -14,6 +14,7 @@ build/
 .env
 .env.*
 !.env.example
+*.local
 
 # Logs
 logs/
@@ -27,6 +28,8 @@ lerna-debug.log*
 # Caches
 .cache/
 **/.cache/
+.eslintcache
+.stylelintcache
 .parcel-cache/
 .turbo/
 .next/
@@ -50,3 +53,5 @@ Thumbs.db
 *.7z
 *.tmp
 *.temp
+tmp/
+temp/
