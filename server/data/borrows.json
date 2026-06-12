@@ -1,0 +1,16 @@
+[
+  {
+    "id": "b001",
+    "instrumentId": "i004",
+    "borrowerId": "u005",
+    "ownerId": "u003",
+    "startDate": "2026-06-10",
+    "endDate": "2026-06-20",
+    "purpose": "排练需要用小提琴演奏一首曲子",
+    "depositPaid": 400,
+    "feeTotal": 250,
+    "status": "borrowing",
+    "createdAt": "2026-06-08T10:00:00.000Z",
+    "confirmedAt": "2026-06-09T14:00:00.000Z"
+  }
+]

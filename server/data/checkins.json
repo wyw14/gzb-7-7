@@ -1,0 +1,42 @@
+[
+  {
+    "id": "c001",
+    "userId": "u001",
+    "instrument": "古典吉他",
+    "piece": "爱的罗曼史",
+    "duration": 60,
+    "notes": "今天重点练了第二段的轮指，感觉进步了一点点",
+    "photo": "",
+    "createdAt": "2026-06-10T20:30:00.000Z"
+  },
+  {
+    "id": "c002",
+    "userId": "u002",
+    "instrument": "钢琴",
+    "piece": "肖邦夜曲 Op.9 No.2",
+    "duration": 90,
+    "notes": "慢慢磨装饰音，快了容易糊",
+    "photo": "",
+    "createdAt": "2026-06-10T22:00:00.000Z"
+  },
+  {
+    "id": "c003",
+    "userId": "u003",
+    "instrument": "小提琴",
+    "piece": "铃木教程第一册",
+    "duration": 45,
+    "notes": "空弦练习+音阶，继续打磨音准",
+    "photo": "",
+    "createdAt": "2026-06-11T08:00:00.000Z"
+  },
+  {
+    "id": "c004",
+    "userId": "u001",
+    "instrument": "尤克里里",
+    "piece": "小手拉大手",
+    "duration": 30,
+    "notes": "扫弦节奏终于稳了一些",
+    "photo": "",
+    "createdAt": "2026-06-11T21:00:00.000Z"
+  }
+]

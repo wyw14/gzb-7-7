@@ -1,0 +1,48 @@
+[
+  {
+    "id": "inv001",
+    "inviterId": "u001",
+    "inviteeId": "u005",
+    "instrument": "古典吉他",
+    "piece": "爱的罗曼史",
+    "skillLevelMatch": "中级-中级",
+    "meetTime": "2026-06-15 14:00",
+    "location": "北京市海淀区某咖啡馆",
+    "latitude": 39.91,
+    "longitude": 116.32,
+    "message": "想一起练练爱的罗曼史二重奏，你有时间吗？",
+    "status": "pending",
+    "createdAt": "2026-06-11T09:30:00.000Z"
+  },
+  {
+    "id": "inv002",
+    "inviterId": "u002",
+    "inviteeId": "u004",
+    "instrument": "钢琴",
+    "piece": "肖邦夜曲",
+    "skillLevelMatch": "高级-高级",
+    "meetTime": "2026-06-14 19:00",
+    "location": "北京市朝阳区某音乐教室",
+    "latitude": 39.93,
+    "longitude": 116.45,
+    "message": "找个鼓手配合一下，我弹钢琴你打鼓，试试即兴？",
+    "status": "accepted",
+    "createdAt": "2026-06-10T15:00:00.000Z",
+    "repliedAt": "2026-06-10T18:20:00.000Z"
+  },
+  {
+    "id": "invb08dd2bc",
+    "inviterId": "uff588bd4",
+    "inviteeId": "u003",
+    "instrument": "小提琴",
+    "piece": "dasd",
+    "skillLevelMatch": "初级-初级",
+    "meetTime": "2026/6/1 00:00:00",
+    "location": "dsa ",
+    "latitude": 39.9128,
+    "longitude": 116.3634,
+    "message": "das ",
+    "status": "pending",
+    "createdAt": "2026-06-11T19:42:49.669Z"
+  }
+]

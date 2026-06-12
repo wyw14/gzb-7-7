@@ -1,0 +1,46 @@
+[
+  {
+    "id": "r001",
+    "reviewerId": "u001",
+    "revieweeId": "u002",
+    "targetType": "user",
+    "targetId": "u002",
+    "rating": 5,
+    "content": "钢琴少女人特别好，一起练琴收获很大，水平真的很高！",
+    "context": "陪练邀约",
+    "createdAt": "2026-05-20T14:00:00.000Z"
+  },
+  {
+    "id": "r002",
+    "reviewerId": "u002",
+    "revieweeId": "u001",
+    "targetType": "user",
+    "targetId": "u001",
+    "rating": 5,
+    "content": "小明同学练琴很认真，态度很好，期待下次一起合作",
+    "context": "陪练邀约",
+    "createdAt": "2026-05-20T15:00:00.000Z"
+  },
+  {
+    "id": "r003",
+    "reviewerId": "u003",
+    "revieweeId": "u005",
+    "targetType": "borrow",
+    "targetId": "b001",
+    "rating": 4,
+    "content": "乐器保养得很好，借用过程很顺利，下次还来",
+    "context": "乐器借用",
+    "createdAt": "2026-06-01T10:00:00.000Z"
+  },
+  {
+    "id": "r004",
+    "reviewerId": "u004",
+    "revieweeId": "u002",
+    "targetType": "user",
+    "targetId": "u002",
+    "rating": 5,
+    "content": "配合非常默契，钢琴水平一流，乐队感十足！",
+    "context": "陪练邀约",
+    "createdAt": "2026-04-15T20:00:00.000Z"
+  }
+]

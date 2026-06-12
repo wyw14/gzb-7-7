@@ -1,0 +1,155 @@
+[
+  {
+    "id": "u001",
+    "username": "音乐小明",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=xiaoming",
+    "phone": "13800138001",
+    "city": "北京市",
+    "district": "海淀区",
+    "latitude": 39.9042,
+    "longitude": 116.4074,
+    "bio": "热爱古典吉他，弹了5年，想找一起练琴的朋友",
+    "skillLevel": "中级",
+    "instruments": [
+      "古典吉他",
+      "尤克里里"
+    ],
+    "favoritePieces": [
+      "爱的罗曼史",
+      "阿尔罕布拉宫的回忆"
+    ],
+    "freeTimes": [
+      "周六下午",
+      "周日全天"
+    ],
+    "rating": 4.8,
+    "reviewCount": 12,
+    "createdAt": "2025-10-01T10:00:00.000Z"
+  },
+  {
+    "id": "u002",
+    "username": "钢琴少女",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=piano",
+    "phone": "13800138002",
+    "city": "北京市",
+    "district": "朝阳区",
+    "latitude": 39.9219,
+    "longitude": 116.4439,
+    "bio": "钢琴8级，喜欢肖邦，偶尔弹爵士",
+    "skillLevel": "高级",
+    "instruments": [
+      "钢琴",
+      "电子琴"
+    ],
+    "favoritePieces": [
+      "肖邦夜曲",
+      "梦中的婚礼"
+    ],
+    "freeTimes": [
+      "工作日晚上",
+      "周六上午"
+    ],
+    "rating": 4.9,
+    "reviewCount": 28,
+    "createdAt": "2025-09-15T08:30:00.000Z"
+  },
+  {
+    "id": "u003",
+    "username": "小提琴新手",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=violin",
+    "phone": "13800138003",
+    "city": "北京市",
+    "district": "西城区",
+    "latitude": 39.9128,
+    "longitude": 116.3634,
+    "bio": "刚学小提琴半年，希望找到一起进步的小伙伴",
+    "skillLevel": "初级",
+    "instruments": [
+      "小提琴"
+    ],
+    "favoritePieces": [
+      "铃木小提琴教程",
+      "小星星变奏曲"
+    ],
+    "freeTimes": [
+      "周末全天",
+      "周三晚上"
+    ],
+    "rating": 4.5,
+    "reviewCount": 6,
+    "createdAt": "2025-11-01T14:20:00.000Z"
+  },
+  {
+    "id": "u004",
+    "username": "爵士鼓手",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=drum",
+    "phone": "13800138004",
+    "city": "北京市",
+    "district": "丰台区",
+    "latitude": 39.8584,
+    "longitude": 116.2871,
+    "bio": "打鼓10年，想组个小乐队玩玩",
+    "skillLevel": "高级",
+    "instruments": [
+      "架子鼓",
+      "卡洪鼓"
+    ],
+    "favoritePieces": [
+      "Take Five",
+      "西班牙斗牛曲"
+    ],
+    "freeTimes": [
+      "周五晚上",
+      "周日下午"
+    ],
+    "rating": 4.7,
+    "reviewCount": 18,
+    "createdAt": "2025-08-20T16:00:00.000Z"
+  },
+  {
+    "id": "u005",
+    "username": "笛箫爱好者",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=flute",
+    "phone": "13800138005",
+    "city": "北京市",
+    "district": "东城区",
+    "latitude": 39.9289,
+    "longitude": 116.4167,
+    "bio": "竹笛、洞箫、埙都略懂，国乐爱好者",
+    "skillLevel": "中级",
+    "instruments": [
+      "竹笛",
+      "洞箫",
+      "陶埙"
+    ],
+    "favoritePieces": [
+      "姑苏行",
+      "平湖秋月"
+    ],
+    "freeTimes": [
+      "每天早晨",
+      "周日下午"
+    ],
+    "rating": 4.6,
+    "reviewCount": 9,
+    "createdAt": "2025-10-10T09:00:00.000Z"
+  },
+  {
+    "id": "uff588bd4",
+    "username": "31312",
+    "avatar": "https://api.dicebear.com/7.x/avataaars/svg?seed=9ad131",
+    "phone": "3123231",
+    "city": "北京市",
+    "district": "海淀区",
+    "latitude": 39.9042,
+    "longitude": 116.4074,
+    "bio": "这个人很懒，什么都没留下...",
+    "skillLevel": "初级",
+    "instruments": [],
+    "favoritePieces": [],
+    "freeTimes": [],
+    "rating": 5,
+    "reviewCount": 0,
+    "createdAt": "2026-06-11T19:42:21.676Z"
+  }
+]
