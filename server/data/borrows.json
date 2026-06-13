@@ -8,9 +8,17 @@
     "endDate": "2026-06-20",
     "purpose": "排练需要用小提琴演奏一首曲子",
     "depositPaid": 400,
-    "feeTotal": 250,
+    "feeTotal": 275,
     "status": "borrowing",
     "createdAt": "2026-06-08T10:00:00.000Z",
-    "confirmedAt": "2026-06-09T14:00:00.000Z"
+    "confirmedAt": "2026-06-09T14:00:00.000Z",
+    "feeDetail": {
+      "deposit": 400,
+      "dailyFee": 25,
+      "borrowDays": 11,
+      "estimatedTotal": 675,
+      "returnedAmount": 0,
+      "feeNote": "押金在归还完好后退还；租金按实际借用天数结算"
+    }
   }
 ]

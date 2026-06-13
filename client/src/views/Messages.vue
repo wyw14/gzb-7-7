@@ -38,6 +38,38 @@
                     <span><el-icon><Wallet /></el-icon> 租金 ¥{{ b.feeTotal }} + 押金 ¥{{ b.depositPaid }}</span>
                   </div>
                   <p class="msg-body" v-if="b.purpose">借用目的：{{ b.purpose }}</p>
+                  <div class="fee-toggle" @click="toggleFeeDetail(b.id)">
+                    <el-icon><Wallet /></el-icon>
+                    <span>费用明细</span>
+                    <el-icon v-if="expandedFeeIds.has(b.id)"><ArrowUp /></el-icon>
+                    <el-icon v-else><ArrowDown /></el-icon>
+                  </div>
+                  <div v-if="expandedFeeIds.has(b.id) && b.feeDetail" class="fee-detail-panel">
+                    <div class="fee-row">
+                      <span class="fee-label">押金</span>
+                      <span class="fee-value">¥{{ b.feeDetail.deposit }}</span>
+                    </div>
+                    <div class="fee-row">
+                      <span class="fee-label">日租金</span>
+                      <span class="fee-value">¥{{ b.feeDetail.dailyFee }}/天</span>
+                    </div>
+                    <div class="fee-row">
+                      <span class="fee-label">借用天数</span>
+                      <span class="fee-value">{{ b.feeDetail.borrowDays }}天</span>
+                    </div>
+                    <div class="fee-row">
+                      <span class="fee-label">预计总价</span>
+                      <span class="fee-value fee-total">¥{{ b.feeDetail.estimatedTotal }}</span>
+                    </div>
+                    <div class="fee-row">
+                      <span class="fee-label">已归还金额</span>
+                      <span class="fee-value" :class="{ 'fee-returned': b.feeDetail.returnedAmount > 0 }">¥{{ b.feeDetail.returnedAmount }}</span>
+                    </div>
+                    <div class="fee-row" v-if="b.feeDetail.feeNote">
+                      <span class="fee-label">费用备注</span>
+                      <span class="fee-value fee-note">{{ b.feeDetail.feeNote }}</span>
+                    </div>
+                  </div>
                   <div class="msg-actions" v-if="b.status === 'pending'">
                     <el-button type="success" size="small" @click="updateBorrow(b, 'confirmed')">
                       <el-icon><CircleCheck /></el-icon>
@@ -92,6 +124,38 @@
                     <span><el-icon><Wallet /></el-icon> 租金 ¥{{ b.feeTotal }} + 押金 ¥{{ b.depositPaid }}</span>
                   </div>
                   <p class="msg-body" v-if="b.purpose">借用目的：{{ b.purpose }}</p>
+                  <div class="fee-toggle" @click="toggleFeeDetail(b.id)">
+                    <el-icon><Wallet /></el-icon>
+                    <span>费用明细</span>
+                    <el-icon v-if="expandedFeeIds.has(b.id)"><ArrowUp /></el-icon>
+                    <el-icon v-else><ArrowDown /></el-icon>
+                  </div>
+                  <div v-if="expandedFeeIds.has(b.id) && b.feeDetail" class="fee-detail-panel">
+                    <div class="fee-row">
+                      <span class="fee-label">押金</span>
+                      <span class="fee-value">¥{{ b.feeDetail.deposit }}</span>
+                    </div>
+                    <div class="fee-row">
+                      <span class="fee-label">日租金</span>
+                      <span class="fee-value">¥{{ b.feeDetail.dailyFee }}/天</span>
+                    </div>
+                    <div class="fee-row">
+                      <span class="fee-label">借用天数</span>
+                      <span class="fee-value">{{ b.feeDetail.borrowDays }}天</span>
+                    </div>
+                    <div class="fee-row">
+                      <span class="fee-label">预计总价</span>
+                      <span class="fee-value fee-total">¥{{ b.feeDetail.estimatedTotal }}</span>
+                    </div>
+                    <div class="fee-row">
+                      <span class="fee-label">已归还金额</span>
+                      <span class="fee-value" :class="{ 'fee-returned': b.feeDetail.returnedAmount > 0 }">¥{{ b.feeDetail.returnedAmount }}</span>
+                    </div>
+                    <div class="fee-row" v-if="b.feeDetail.feeNote">
+                      <span class="fee-label">费用备注</span>
+                      <span class="fee-value fee-note">{{ b.feeDetail.feeNote }}</span>
+                    </div>
+                  </div>
                   <div class="msg-actions" v-if="b.status === 'borrowing'">
                     <el-tag type="primary" size="small">借用中，请按时归还</el-tag>
                   </div>
@@ -250,7 +314,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useUserStore } from '../stores/user'
 import { borrowApi, invitationApi, reviewApi } from '../api'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Goods, User, Calendar, Wallet, CircleCheck, CircleClose, MagicStick, Notebook, Location, Edit } from '@element-plus/icons-vue'
+import { Goods, User, Calendar, Wallet, CircleCheck, CircleClose, MagicStick, Notebook, Location, Edit, ArrowDown, ArrowUp } from '@element-plus/icons-vue'
 
 const userStore = useUserStore()
 
@@ -259,6 +323,7 @@ const borrows = ref([])
 const invitations = ref([])
 const showReview = ref(false)
 const submitting = ref(false)
+const expandedFeeIds = ref(new Set())
 
 const currentTarget = ref(null)
 
@@ -295,6 +360,12 @@ const pendingBorrowsAsBorrower = computed(() => borrowsAsBorrower.value.filter(b
 const invitationsAsInvitee = computed(() => invitations.value.filter(i => i.inviteeId === userStore.userId))
 const invitationsAsInviter = computed(() => invitations.value.filter(i => i.inviterId === userStore.userId))
 const pendingInvitationsAsInvitee = computed(() => invitationsAsInvitee.value.filter(i => i.status === 'pending'))
+
+const toggleFeeDetail = (id) => {
+  const s = new Set(expandedFeeIds.value)
+  if (s.has(id)) { s.delete(id) } else { s.add(id) }
+  expandedFeeIds.value = s
+}
 
 onMounted(async () => {
   await loadAll()
@@ -574,5 +645,72 @@ const submitReview = async () => {
 
 .empty-state.small .el-icon {
   font-size: 48px;
+}
+
+.fee-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: linear-gradient(135deg, #f0f4ff, #faf5ff);
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--primary-color);
+  cursor: pointer;
+  margin-bottom: 12px;
+  user-select: none;
+  transition: all 0.2s;
+}
+
+.fee-toggle:hover {
+  background: linear-gradient(135deg, #e0e7ff, #f0e6ff);
+}
+
+.fee-detail-panel {
+  background: #fafbfc;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+}
+
+.fee-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px dashed #eee;
+}
+
+.fee-row:last-child {
+  border-bottom: none;
+}
+
+.fee-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.fee-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.fee-total {
+  color: var(--primary-color);
+  font-size: 16px;
+}
+
+.fee-returned {
+  color: var(--success-color);
+}
+
+.fee-note {
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--text-secondary);
+  max-width: 260px;
+  text-align: right;
 }
 </style>

@@ -84,10 +84,37 @@ router.get('/:id', (req, res) => {
 
 router.post('/', (req, res) => {
   const borrows = readJSON('borrows.json', []);
+  const instruments = readJSON('instruments.json', []);
+  
+  const inst = instruments.find(i => i.id === req.body.instrumentId);
+  const deposit = inst ? inst.deposit : (req.body.depositPaid || 0);
+  const dailyFee = inst ? inst.dailyFee : 0;
+  const startDate = req.body.startDate;
+  const endDate = req.body.endDate;
+  let borrowDays = 0;
+  if (startDate && endDate) {
+    const s = new Date(startDate);
+    const e = new Date(endDate);
+    borrowDays = Math.ceil((e - s) / (1000 * 60 * 60 * 24)) + 1;
+  }
+  const feeTotal = borrowDays * dailyFee;
+  const estimatedTotal = deposit + feeTotal;
+  
+  const feeDetail = {
+    deposit,
+    dailyFee,
+    borrowDays,
+    estimatedTotal,
+    returnedAmount: 0,
+    feeNote: req.body.feeNote || '押金在归还完好后退还；租金按实际借用天数结算'
+  };
   
   const newBorrow = {
     id: 'b' + uuidv4().slice(0, 8),
     ...req.body,
+    depositPaid: deposit,
+    feeTotal,
+    feeDetail,
     status: 'pending',
     createdAt: new Date().toISOString()
   };
@@ -129,6 +156,10 @@ router.put('/:id', (req, res) => {
   if (newStatus === 'returned' && oldStatus !== 'returned') {
     borrows[idx].returnedAt = new Date().toISOString();
     borrows[idx].status = 'returned';
+    if (borrows[idx].feeDetail) {
+      borrows[idx].feeDetail.returnedAmount = borrows[idx].feeDetail.deposit;
+      borrows[idx].feeDetail.feeNote = '乐器已完好归还，押金已退还';
+    }
     const instIdx = instruments.findIndex(i => i.id === borrows[idx].instrumentId);
     if (instIdx !== -1) {
       instruments[instIdx].status = 'available';

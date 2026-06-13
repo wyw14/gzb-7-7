@@ -170,18 +170,90 @@
             <p>暂无评价</p>
           </div>
         </el-tab-pane>
+        
+        <el-tab-pane label="借用费用" name="fees">
+          <div class="fee-summary card mb-20">
+            <div class="fee-summary-grid">
+              <div class="fee-stat">
+                <span class="fee-stat-num">{{ feeSummary.totalBorrows }}</span>
+                <span class="fee-stat-label">借用次数</span>
+              </div>
+              <div class="fee-stat">
+                <span class="fee-stat-num primary">¥{{ feeSummary.totalDeposit }}</span>
+                <span class="fee-stat-label">押金总额</span>
+              </div>
+              <div class="fee-stat">
+                <span class="fee-stat-num warning">¥{{ feeSummary.totalFee }}</span>
+                <span class="fee-stat-label">租金总额</span>
+              </div>
+              <div class="fee-stat">
+                <span class="fee-stat-num success">¥{{ feeSummary.totalReturned }}</span>
+                <span class="fee-stat-label">已退还金额</span>
+              </div>
+            </div>
+          </div>
+          <div v-if="myBorrows.length" class="fee-list">
+            <div class="fee-item card" v-for="b in myBorrows" :key="b.id">
+              <div class="fee-item-header" @click="toggleFeeExpand(b.id)">
+                <div class="fee-item-left">
+                  <img v-if="b.instrument?.image" :src="b.instrument.image" class="fee-inst-thumb" />
+                  <div class="fee-item-info">
+                    <span class="fee-inst-name">{{ b.instrument?.name || '未知乐器' }}</span>
+                    <span class="fee-inst-date">{{ b.startDate }} ~ {{ b.endDate }}</span>
+                  </div>
+                </div>
+                <div class="fee-item-right">
+                  <span class="badge" :class="statusClass(b.status)">{{ statusText(b.status) }}</span>
+                  <span class="fee-item-total">¥{{ b.feeDetail?.estimatedTotal || (b.depositPaid + b.feeTotal) }}</span>
+                  <el-icon v-if="expandedFeeIds.has(b.id)"><ArrowUp /></el-icon>
+                  <el-icon v-else><ArrowDown /></el-icon>
+                </div>
+              </div>
+              <div v-if="expandedFeeIds.has(b.id) && b.feeDetail" class="fee-detail-panel">
+                <div class="fee-row">
+                  <span class="fee-label">押金</span>
+                  <span class="fee-value">¥{{ b.feeDetail.deposit }}</span>
+                </div>
+                <div class="fee-row">
+                  <span class="fee-label">日租金</span>
+                  <span class="fee-value">¥{{ b.feeDetail.dailyFee }}/天</span>
+                </div>
+                <div class="fee-row">
+                  <span class="fee-label">借用天数</span>
+                  <span class="fee-value">{{ b.feeDetail.borrowDays }}天</span>
+                </div>
+                <div class="fee-row">
+                  <span class="fee-label">预计总价</span>
+                  <span class="fee-value fee-total">¥{{ b.feeDetail.estimatedTotal }}</span>
+                </div>
+                <div class="fee-row">
+                  <span class="fee-label">已归还金额</span>
+                  <span class="fee-value" :class="{ 'fee-returned': b.feeDetail.returnedAmount > 0 }">¥{{ b.feeDetail.returnedAmount }}</span>
+                </div>
+                <div class="fee-row" v-if="b.feeDetail.feeNote">
+                  <span class="fee-label">费用备注</span>
+                  <span class="fee-value fee-note-text">{{ b.feeDetail.feeNote }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-else class="empty-state">
+            <el-icon><Wallet /></el-icon>
+            <p>暂无借用费用记录</p>
+          </div>
+        </el-tab-pane>
       </el-tabs>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'
-import { checkinApi, instrumentApi, reviewApi } from '../api'
+import { checkinApi, instrumentApi, reviewApi, borrowApi } from '../api'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Check, Plus, Goods, ChatLineSquare } from '@element-plus/icons-vue'
+import { Check, Plus, Goods, ChatLineSquare, Wallet, ArrowDown, ArrowUp } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -191,6 +263,8 @@ const saving = ref(false)
 const stats = ref(null)
 const myInstruments = ref([])
 const myReviews = ref([])
+const myBorrows = ref([])
+const expandedFeeIds = ref(new Set())
 
 const form = reactive({
   ...(userStore.currentUser || {}),
@@ -215,6 +289,16 @@ onMounted(async () => {
   try {
     myReviews.value = await reviewApi.list({ revieweeId: userStore.userId })
   } catch (e) {}
+  try {
+    const [asOwner, asBorrower] = await Promise.all([
+      borrowApi.list({ ownerId: userStore.userId }),
+      borrowApi.list({ borrowerId: userStore.userId })
+    ])
+    const borrowSet = new Map()
+    asOwner.forEach(b => borrowSet.set(b.id, b))
+    asBorrower.forEach(b => { if (!borrowSet.has(b.id)) borrowSet.set(b.id, b) })
+    myBorrows.value = Array.from(borrowSet.values()).filter(b => b.status !== 'rejected')
+  } catch (e) {}
 })
 
 const randomAvatar = () => {
@@ -238,6 +322,32 @@ const saveProfile = async () => {
   } finally {
     saving.value = false
   }
+}
+
+const feeSummary = computed(() => {
+  const borrows = myBorrows.value
+  return {
+    totalBorrows: borrows.length,
+    totalDeposit: borrows.reduce((sum, b) => sum + (b.feeDetail?.deposit || b.depositPaid || 0), 0),
+    totalFee: borrows.reduce((sum, b) => sum + (b.feeTotal || 0), 0),
+    totalReturned: borrows.reduce((sum, b) => sum + (b.feeDetail?.returnedAmount || 0), 0)
+  }
+})
+
+const statusMap = {
+  pending: { text: '待处理', class: 'badge-warning' },
+  confirmed: { text: '已确认', class: 'badge-primary' },
+  borrowing: { text: '借用中', class: 'badge-primary' },
+  returned: { text: '已归还', class: 'badge-success' },
+  rejected: { text: '已拒绝', class: 'badge-danger' }
+}
+const statusText = (s) => statusMap[s]?.text || s
+const statusClass = (s) => statusMap[s]?.class || 'badge-primary'
+
+const toggleFeeExpand = (id) => {
+  const s = new Set(expandedFeeIds.value)
+  if (s.has(id)) { s.delete(id) } else { s.add(id) }
+  expandedFeeIds.value = s
 }
 
 const deleteInstrument = async (inst) => {
@@ -434,6 +544,162 @@ const deleteInstrument = async (inst) => {
   }
   .grid-4 {
     grid-template-columns: 1fr 1fr;
+  }
+}
+
+.fee-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.fee-stat {
+  text-align: center;
+  padding: 18px 12px;
+  background: var(--bg-light);
+  border-radius: 10px;
+}
+
+.fee-stat-num {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.fee-stat-num.primary {
+  color: var(--primary-color);
+}
+
+.fee-stat-num.warning {
+  color: var(--secondary-color);
+}
+
+.fee-stat-num.success {
+  color: var(--success-color);
+}
+
+.fee-stat-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.fee-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.fee-item {
+  padding: 0;
+  overflow: hidden;
+}
+
+.fee-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+
+.fee-item-header:hover {
+  background: var(--bg-light);
+}
+
+.fee-item-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.fee-inst-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.fee-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fee-inst-name {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.fee-inst-date {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.fee-item-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fee-item-total {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.fee-detail-panel {
+  background: #fafbfc;
+  border-top: 1px solid var(--border-color);
+  padding: 16px 20px;
+}
+
+.fee-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px dashed #eee;
+}
+
+.fee-row:last-child {
+  border-bottom: none;
+}
+
+.fee-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.fee-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.fee-total {
+  color: var(--primary-color);
+  font-size: 16px;
+}
+
+.fee-returned {
+  color: var(--success-color);
+}
+
+.fee-note-text {
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--text-secondary);
+  max-width: 260px;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .fee-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 </style>
