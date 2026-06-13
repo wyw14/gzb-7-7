@@ -204,35 +204,35 @@
                 </div>
                 <div class="fee-item-right">
                   <span class="badge" :class="statusClass(b.status)">{{ statusText(b.status) }}</span>
-                  <span class="fee-item-total">¥{{ b.feeDetail?.estimatedTotal || (b.depositPaid + b.feeTotal) }}</span>
+                  <span class="fee-item-total">¥{{ getFeeDetail(b).estimatedTotal }}</span>
                   <el-icon v-if="expandedFeeIds.has(b.id)"><ArrowUp /></el-icon>
                   <el-icon v-else><ArrowDown /></el-icon>
                 </div>
               </div>
-              <div v-if="expandedFeeIds.has(b.id) && b.feeDetail" class="fee-detail-panel">
+              <div v-if="expandedFeeIds.has(b.id)" class="fee-detail-panel">
                 <div class="fee-row">
                   <span class="fee-label">押金</span>
-                  <span class="fee-value">¥{{ b.feeDetail.deposit }}</span>
+                  <span class="fee-value">¥{{ getFeeDetail(b).deposit }}</span>
                 </div>
                 <div class="fee-row">
                   <span class="fee-label">日租金</span>
-                  <span class="fee-value">¥{{ b.feeDetail.dailyFee }}/天</span>
+                  <span class="fee-value">¥{{ getFeeDetail(b).dailyFee }}/天</span>
                 </div>
                 <div class="fee-row">
                   <span class="fee-label">借用天数</span>
-                  <span class="fee-value">{{ b.feeDetail.borrowDays }}天</span>
+                  <span class="fee-value">{{ getFeeDetail(b).borrowDays }}天</span>
                 </div>
                 <div class="fee-row">
                   <span class="fee-label">预计总价</span>
-                  <span class="fee-value fee-total">¥{{ b.feeDetail.estimatedTotal }}</span>
+                  <span class="fee-value fee-total">¥{{ getFeeDetail(b).estimatedTotal }}</span>
                 </div>
                 <div class="fee-row">
                   <span class="fee-label">已归还金额</span>
-                  <span class="fee-value" :class="{ 'fee-returned': b.feeDetail.returnedAmount > 0 }">¥{{ b.feeDetail.returnedAmount }}</span>
+                  <span class="fee-value" :class="{ 'fee-returned': getFeeDetail(b).returnedAmount > 0 }">¥{{ getFeeDetail(b).returnedAmount }}</span>
                 </div>
-                <div class="fee-row" v-if="b.feeDetail.feeNote">
+                <div class="fee-row" v-if="getFeeDetail(b).feeNote">
                   <span class="fee-label">费用备注</span>
-                  <span class="fee-value fee-note-text">{{ b.feeDetail.feeNote }}</span>
+                  <span class="fee-value fee-note-text">{{ getFeeDetail(b).feeNote }}</span>
                 </div>
               </div>
             </div>
@@ -348,6 +348,34 @@ const toggleFeeExpand = (id) => {
   const s = new Set(expandedFeeIds.value)
   if (s.has(id)) { s.delete(id) } else { s.add(id) }
   expandedFeeIds.value = s
+}
+
+const getFeeDetail = (b) => {
+  if (b?.feeDetail) return b.feeDetail
+  const deposit = b?.depositPaid || 0
+  const dailyFee = b?.instrument?.dailyFee || 0
+  let borrowDays = 0
+  if (b?.startDate && b?.endDate) {
+    const s = new Date(b.startDate)
+    const e = new Date(b.endDate)
+    borrowDays = Math.ceil((e - s) / (1000 * 60 * 60 * 24)) + 1
+  }
+  const feeTotal = b?.feeTotal != null ? b.feeTotal : borrowDays * dailyFee
+  const estimatedTotal = deposit + feeTotal
+  let returnedAmount = 0
+  let feeNote = '押金在归还完好后退还；租金按实际借用天数结算'
+  if (b?.status === 'returned') {
+    returnedAmount = deposit
+    feeNote = '乐器已完好归还，押金已退还'
+  }
+  return {
+    deposit,
+    dailyFee,
+    borrowDays,
+    estimatedTotal,
+    returnedAmount,
+    feeNote
+  }
 }
 
 const deleteInstrument = async (inst) => {

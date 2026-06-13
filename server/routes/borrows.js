@@ -4,6 +4,40 @@ const { readJSON, writeJSON } = require('../utils/storage');
 
 const router = express.Router();
 
+const buildFeeDetail = (borrow, instrument) => {
+  if (borrow.feeDetail) return borrow.feeDetail;
+  
+  const deposit = borrow.depositPaid || (instrument ? instrument.deposit : 0);
+  const dailyFee = instrument ? instrument.dailyFee : 0;
+  let borrowDays = 0;
+  if (borrow.startDate && borrow.endDate) {
+    const s = new Date(borrow.startDate);
+    const e = new Date(borrow.endDate);
+    borrowDays = Math.ceil((e - s) / (1000 * 60 * 60 * 24)) + 1;
+  }
+  const feeTotal = borrow.feeTotal != null ? borrow.feeTotal : borrowDays * dailyFee;
+  const estimatedTotal = deposit + feeTotal;
+  
+  let returnedAmount = 0;
+  if (borrow.status === 'returned') {
+    returnedAmount = deposit;
+  }
+  
+  let feeNote = '押金在归还完好后退还；租金按实际借用天数结算';
+  if (borrow.status === 'returned') {
+    feeNote = '乐器已完好归还，押金已退还';
+  }
+  
+  return {
+    deposit,
+    dailyFee,
+    borrowDays,
+    estimatedTotal,
+    returnedAmount,
+    feeNote
+  };
+};
+
 router.get('/', (req, res) => {
   const borrows = readJSON('borrows.json', []);
   const instruments = readJSON('instruments.json', []);
@@ -47,13 +81,17 @@ router.get('/', (req, res) => {
       }
     }
     
+    const inst = instruments.find(i => i.id === b.instrumentId) || null;
+    const feeDetail = buildFeeDetail(b, inst);
+    
     return {
       ...b,
+      feeDetail,
       borrowerReviewed,
       ownerReviewed,
       myReviewed,
       canReviewOther,
-      instrument: instruments.find(i => i.id === b.instrumentId) || null,
+      instrument: inst,
       borrower: users.find(u => u.id === b.borrowerId) || null,
       owner: users.find(u => u.id === b.ownerId) || null
     };
@@ -72,9 +110,13 @@ router.get('/:id', (req, res) => {
     return res.status(404).json({ error: '借用记录不存在' });
   }
   
+  const inst = instruments.find(i => i.id === borrow.instrumentId) || null;
+  const feeDetail = buildFeeDetail(borrow, inst);
+  
   const result = {
     ...borrow,
-    instrument: instruments.find(i => i.id === borrow.instrumentId) || null,
+    feeDetail,
+    instrument: inst,
     borrower: users.find(u => u.id === borrow.borrowerId) || null,
     owner: users.find(u => u.id === borrow.ownerId) || null
   };
@@ -156,13 +198,10 @@ router.put('/:id', (req, res) => {
   if (newStatus === 'returned' && oldStatus !== 'returned') {
     borrows[idx].returnedAt = new Date().toISOString();
     borrows[idx].status = 'returned';
-    if (borrows[idx].feeDetail) {
-      borrows[idx].feeDetail.returnedAmount = borrows[idx].feeDetail.deposit;
-      borrows[idx].feeDetail.feeNote = '乐器已完好归还，押金已退还';
-    }
-    const instIdx = instruments.findIndex(i => i.id === borrows[idx].instrumentId);
-    if (instIdx !== -1) {
-      instruments[instIdx].status = 'available';
+    const inst = instruments.find(i => i.id === borrows[idx].instrumentId);
+    borrows[idx].feeDetail = buildFeeDetail(borrows[idx], inst);
+    if (inst) {
+      inst.status = 'available';
       writeJSON('instruments.json', instruments);
     }
   }
